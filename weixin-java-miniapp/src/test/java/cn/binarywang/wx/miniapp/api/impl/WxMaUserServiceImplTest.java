@@ -59,7 +59,7 @@ public class WxMaUserServiceImplTest {
 
   @Test
   public void testGetPhoneInfo() throws WxErrorException {
-    WxMaPhoneNumberInfo phoneNoInfo = this.wxService.getUserService().getPhoneNumber("tiihtNczf5v6AKRyjwEUhQ==");
+    WxMaPhoneNumberInfo phoneNoInfo = this.wxService.getUserService().getPhoneNumber("f762a9dd33e6c4996355f75bd25a3287f65b9fd3557e0eed1a22730a9f5164ab");
     assertNotNull(phoneNoInfo);
     System.out.println(phoneNoInfo.toString());
   }

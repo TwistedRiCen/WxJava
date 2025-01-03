@@ -23,7 +23,7 @@ public class WxMaShareServiceImplTest {
 
   @Test
   public void testGetSessionKey() throws Exception {
-    assertNotNull(this.wxService.getUserService().getSessionInfo("aaa"));
+    assertNotNull(this.wxService.getUserService().getSessionInfo("0e3jHr000A2QeT1Ong400qEBwa3jHr00"));
   }
 
   /**
