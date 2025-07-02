@@ -38,6 +38,7 @@ import me.chanjar.weixin.common.bean.WxAccessToken;
 import me.chanjar.weixin.common.enums.WxType;
 import me.chanjar.weixin.common.error.WxError;
 import me.chanjar.weixin.common.error.WxErrorException;
+import me.chanjar.weixin.common.error.WxMaErrorMsgEnum;
 import me.chanjar.weixin.common.error.WxRuntimeException;
 import me.chanjar.weixin.common.executor.CommonUploadRequestExecutor;
 import me.chanjar.weixin.common.service.WxImgProcService;
@@ -153,6 +154,9 @@ public abstract class BaseWxMaServiceImpl<H, P> implements WxMaService, RequestH
   private final WxMaOrderShippingService wxMaOrderShippingService =
       new WxMaOrderShippingServiceImpl(this);
 
+  private final WxMaOrderManagementService wxMaOrderManagementService =
+      new WxMaOrderManagementServiceImpl(this);
+
   private final WxMaOpenApiService wxMaOpenApiService = new WxMaOpenApiServiceImpl(this);
   private final WxMaVodService wxMaVodService = new WxMaVodServiceImpl(this);
   private final WxMaXPayService wxMaXPayService = new WxMaXPayServiceImpl(this);
@@ -166,7 +170,7 @@ public abstract class BaseWxMaServiceImpl<H, P> implements WxMaService, RequestH
   private int maxRetryTimes = 5;
 
   @Override
-  public RequestHttp getRequestHttp() {
+  public RequestHttp<H, P> getRequestHttp() {
     return this;
   }
 
@@ -229,7 +233,7 @@ public abstract class BaseWxMaServiceImpl<H, P> implements WxMaService, RequestH
     try {
       return SHA1.gen(this.getWxMaConfig().getToken(), timestamp, nonce).equals(signature);
     } catch (Exception e) {
-      log.error("Checking signature failed, and the reason is :" + e.getMessage());
+      log.error("Checking signature failed, and the reason is :{}", e.getMessage());
       return false;
     }
   }
@@ -294,7 +298,7 @@ public abstract class BaseWxMaServiceImpl<H, P> implements WxMaService, RequestH
 
   private boolean isApiSignatureRequired(String url) {
     return this.getWxMaConfig().getApiSignatureAesKey() != null
-        && Arrays.stream(urlPathSupportApiSignature).anyMatch(part -> url.contains(part));
+        && Arrays.stream(urlPathSupportApiSignature).anyMatch(url::contains);
   }
 
   @Override
@@ -358,7 +362,7 @@ public abstract class BaseWxMaServiceImpl<H, P> implements WxMaService, RequestH
 
   @Override
   public WxMaApiResponse execute(
-      ApiSignaturePostRequestExecutor executor,
+      ApiSignaturePostRequestExecutor<?, ?> executor,
       String uri,
       Map<String, String> headers,
       String data)
@@ -455,7 +459,12 @@ public abstract class BaseWxMaServiceImpl<H, P> implements WxMaService, RequestH
       }
 
       if (error.getErrorCode() != 0) {
-        log.warn("\n【请求地址】: {}\n【请求参数】：{}\n【错误信息】：{}", uriWithAccessToken, dataForLog, error);
+        if (error.getErrorCode() == WxMaErrorMsgEnum.CODE_43101.getCode()) {
+          // 43101 日志太多, 打印为debug, 其他情况打印为warn
+          log.debug("\n【请求地址】: {}\n【请求参数】：{}\n【错误信息】：{}", uriWithAccessToken, dataForLog, error);
+        } else {
+          log.warn("\n【请求地址】: {}\n【请求参数】：{}\n【错误信息】：{}", uriWithAccessToken, dataForLog, error);
+        }
         throw new WxErrorException(error, e);
       }
       return null;
@@ -499,7 +508,10 @@ public abstract class BaseWxMaServiceImpl<H, P> implements WxMaService, RequestH
   @Override
   public void setWxMaConfig(WxMaConfig maConfig) {
     final String appid = maConfig.getAppid();
-    this.setMultiConfigs(ImmutableMap.of(appid, maConfig), appid);
+    Map<String, WxMaConfig> map = new HashMap<>();
+    map.put(appid, maConfig);
+    Map<String, WxMaConfig> configMap = Collections.unmodifiableMap(map);
+    this.setMultiConfigs(configMap, appid);
   }
 
   @Override
@@ -812,6 +824,16 @@ public abstract class BaseWxMaServiceImpl<H, P> implements WxMaService, RequestH
   @Override
   public WxMaOrderShippingService getWxMaOrderShippingService() {
     return this.wxMaOrderShippingService;
+  }
+
+  /**
+   * 小程序订单管理服务
+   *
+   * @return WxMaOrderManagementService
+   */
+  @Override
+  public WxMaOrderManagementService getWxMaOrderManagementService() {
+    return this.wxMaOrderManagementService;
   }
 
   @Override

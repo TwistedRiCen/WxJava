@@ -130,6 +130,10 @@ public interface WxCpApiPathConsts {
      * The constant WORKBENCH_DATA_SET.
      */
     String WORKBENCH_DATA_SET = "/cgi-bin/agent/set_workbench_data";
+    /**
+     * The constant WORKBENCH_BATCH_DATA_SET.
+     */
+    String WORKBENCH_BATCH_DATA_SET = "/cgi-bin/agent/batch_set_workbench_data";
   }
 
   /**
@@ -234,6 +238,12 @@ public interface WxCpApiPathConsts {
      * The constant JSSDK_MEDIA_GET.
      */
     String JSSDK_MEDIA_GET = "/cgi-bin/media/get/jssdk";
+
+    /** The constant GET_UPLOAD_BY_URL_RESULT. */
+    String GET_UPLOAD_BY_URL_RESULT = "/cgi-bin/media/get_upload_by_url_result";
+
+    /** The constant UPLOAD_BY_URL. */
+    String UPLOAD_BY_URL = "/cgi-bin/media/upload_by_url";
   }
 
   /**
@@ -691,7 +701,7 @@ public interface WxCpApiPathConsts {
     /**
      * The constant DEPARTMENT_LIST.
      */
-    String DEPARTMENT_LIST = "/cgi-bin/school/department/list?id=";
+    String DEPARTMENT_LIST = "/cgi-bin/school/department/list";
 
     /**
      * The constant GET_PAYMENT_RESULT.
@@ -1086,6 +1096,10 @@ public interface WxCpApiPathConsts {
      */
     String GET_CONTACT_WAY = "/cgi-bin/externalcontact/get_contact_way";
     /**
+     * The constant LIST_CONTACT_WAY.
+     */
+    String LIST_CONTACT_WAY = "/cgi-bin/externalcontact/list_contact_way";
+    /**
      * The constant UPDATE_CONTACT_WAY.
      */
     String UPDATE_CONTACT_WAY = "/cgi-bin/externalcontact/update_contact_way";
@@ -1137,6 +1151,9 @@ public interface WxCpApiPathConsts {
      * The constant GET_CONTACT_DETAIL_BATCH.
      */
     String GET_CONTACT_DETAIL_BATCH = "/cgi-bin/externalcontact/batch/get_by_user?";
+
+    String GET_CONTACT_LIST = "/cgi-bin/externalcontact/contact_list?";
+
     /**
      * The constant UPDATE_REMARK.
      */

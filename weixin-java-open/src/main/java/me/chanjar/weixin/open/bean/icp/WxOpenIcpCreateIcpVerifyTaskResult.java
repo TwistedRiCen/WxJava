@@ -1,7 +1,5 @@
 package me.chanjar.weixin.open.bean.icp;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,4 +24,9 @@ public class WxOpenIcpCreateIcpVerifyTaskResult extends WxOpenResult {
   @SerializedName("task_id")
   private String taskId;
 
+  /**
+   * 人脸核验任务url，along_with_auth 填 true 时返回。
+   */
+  @SerializedName("verify_url")
+  private String verifyUrl;
 }
