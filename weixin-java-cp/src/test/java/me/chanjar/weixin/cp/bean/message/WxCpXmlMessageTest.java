@@ -72,7 +72,7 @@ public class WxCpXmlMessageTest {
     assertEquals(wxMessage.getCreateTime(), Long.valueOf(1348831860));
     assertEquals(wxMessage.getMsgType(), WxConsts.XmlMsgType.TEXT);
     assertEquals(wxMessage.getContent(), "this is a test");
-    assertEquals(wxMessage.getMsgId(), Long.valueOf(1234567890123456L));
+    assertEquals(wxMessage.getMsgId(), "1234567890123456");
     assertEquals(wxMessage.getPicUrl(), "this is a url");
     assertEquals(wxMessage.getMediaId(), "media_id");
     assertEquals(wxMessage.getFormat(), "Format");
@@ -441,5 +441,60 @@ public class WxCpXmlMessageTest {
     assertThat(wxCpXmlMessage.getJobId()).isNotEmpty();
     assertThat(wxCpXmlMessage.getJobId()).isEqualTo("jobid_S0MrnndvRG5fadSlLwiBqiDDbM143UqTmKP3152FZk4");
     assertThat(wxCpXmlMessage.getEvent()).isEqualTo(UPLOAD_MEDIA_JOB_FINISH);
+  }
+
+  /**
+   * Test both numeric and string msgId formats to ensure backward compatibility
+   */
+  public void testMsgIdStringAndNumericFormats() {
+    // Test with numeric msgId (old format)
+    String xmlWithNumeric = "<xml>"
+      + "<ToUserName><![CDATA[toUser]]></ToUserName>"
+      + "<FromUserName><![CDATA[fromUser]]></FromUserName>"
+      + "<CreateTime>1348831860</CreateTime>"
+      + "<MsgType><![CDATA[text]]></MsgType>"
+      + "<Content><![CDATA[this is a test]]></Content>"
+      + "<MsgId>1234567890123456</MsgId>"
+      + "</xml>";
+    WxCpXmlMessage wxMessageNumeric = WxCpXmlMessage.fromXml(xmlWithNumeric);
+    assertEquals(wxMessageNumeric.getMsgId(), "1234567890123456");
+
+    // Test with string msgId (new format - the actual issue case)
+    String xmlWithString = "<xml>"
+      + "<ToUserName><![CDATA[toUser]]></ToUserName>"
+      + "<FromUserName><![CDATA[fromUser]]></FromUserName>"
+      + "<CreateTime>1348831860</CreateTime>"
+      + "<MsgType><![CDATA[text]]></MsgType>"
+      + "<Content><![CDATA[this is a test]]></Content>"
+      + "<MsgId>CAIQg/PKxgYY2sC9tpuAgAMg9/zKaw==</MsgId>"
+      + "</xml>";
+    WxCpXmlMessage wxMessageString = WxCpXmlMessage.fromXml(xmlWithString);
+    assertEquals(wxMessageString.getMsgId(), "CAIQg/PKxgYY2sC9tpuAgAMg9/zKaw==");
+  }
+
+  /**
+   * Test intelligent robot message parsing
+   * 测试智能机器人消息解析
+   */
+  public void testIntelligentRobotMessage() {
+    String xml = "<xml>"
+      + "<ToUserName><![CDATA[toUser]]></ToUserName>"
+      + "<FromUserName><![CDATA[fromUser]]></FromUserName>"
+      + "<CreateTime>1348831860</CreateTime>"
+      + "<MsgType><![CDATA[text]]></MsgType>"
+      + "<Content><![CDATA[你好，智能机器人]]></Content>"
+      + "<MsgId>msg123456</MsgId>"
+      + "<RobotId><![CDATA[robot_id_123]]></RobotId>"
+      + "<SessionId><![CDATA[session_id_456]]></SessionId>"
+      + "</xml>";
+    WxCpXmlMessage wxMessage = WxCpXmlMessage.fromXml(xml);
+    assertEquals(wxMessage.getToUserName(), "toUser");
+    assertEquals(wxMessage.getFromUserName(), "fromUser");
+    assertEquals(wxMessage.getCreateTime(), Long.valueOf(1348831860));
+    assertEquals(wxMessage.getMsgType(), WxConsts.XmlMsgType.TEXT);
+    assertEquals(wxMessage.getContent(), "你好，智能机器人");
+    assertEquals(wxMessage.getMsgId(), "msg123456");
+    assertEquals(wxMessage.getRobotId(), "robot_id_123");
+    assertEquals(wxMessage.getSessionId(), "session_id_456");
   }
 }
